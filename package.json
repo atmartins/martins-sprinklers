@@ -1,0 +1,22 @@
+{
+  "name": "martins-sprinklers",
+  "version": "0.0.1",
+  "description": "Smart Sprinkler System written in Node for Raspberry Pi.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "./node_modules/mocha/bin/mocha test/*"
+  },
+  "author": "Aaron Martins",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.15.2",
+    "pi-gpio": "0.0.8"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-as-promised": "^6.0.0",
+    "mocha": "^3.4.2",
+    "mock-require": "^2.0.2"
+  }
+}
