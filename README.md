@@ -36,7 +36,3 @@ Returns an object like:
 }
 ```
 or a similarly-shaped error.
-
-
-## Hardware
-[Photo of the sprinkler valve manifold](https://goo.gl/photos/eYZANNdi633yRVty7)
