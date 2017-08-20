@@ -1,9 +1,27 @@
 'use strict';
 
-const gpio = require('rpi-gpio');
 const express = require('express');
+const winston = require('winston');
+const moment = require('moment');
 const Zone = require('./lib/Zone');
 const ZoneController = require('./lib/ZoneController');
+
+var logger = new winston.Logger({
+  transports: [
+    new winston.transports.Console({
+      timestamp: function () {
+        return new moment().format();
+      }
+    }),
+    new winston.transports.File({
+      filename: 'martins-sprinklers.log',
+      timestamp: function () {
+        return new moment().format();
+      }
+    })
+  ]
+});
+//winston.add(winston.transports.File, { filename: 'martins-sprinklers.log' });
 
 const app = express();
 const PORT = 3217;
@@ -21,24 +39,34 @@ let zc = new ZoneController(),
 
 function serve() {
   return new Promise((resolve, reject) => {
-    app.use(express.static('public'));
-    app.listen(PORT, () => {});
-    resolve(`Martins' sprinklers app listening on ${PORT}`);
+    try {
+      app.use(express.static('public'));
+      app.listen(PORT, () => {});
+      let msg = `Martins' sprinklers app listening on ${PORT}`;
+      logger.info(msg);
+      resolve(msg);
+    } catch(e) {
+      reject(e);
+    }
   });
 }
 
 app.put('/channel/all/:state', (req, res) => {
   zc.setStateAll(req.params.state)
     .then( () => {
+      let msg = `Successfully set all channels to ${req.params.state}.`;
       let rsp = {
         id: 'all',
         state: req.params.state,
-        msg: `Successfully set all channels to ${req.params.state}.`
+        msg: msg
       };
+      logger.info(msg);
       res.send(rsp);
     })
     .catch( e => {
-      res.send(`Error setting all channels to ${req.params.state}. ${e}`);
+      let msg = `Error setting all channels to ${req.params.state}. ${e}`;
+      logger.error(msg);
+      res.send(msg);
     });
 });
 
@@ -48,11 +76,13 @@ app.put('/channel/:id/:state', (req, res) => {
       return zone.setState(req.params.state);
     })
     .then( () => {
+      let msg = `Set zone ${req.params.id} to ${req.params.state}.`;
       let rsp = {
         id: req.params.id,
         state: req.params.state,
-        msg: `Set zone ${req.params.id} to ${req.params.state}.`
+        msg: msg
       };
+      logger.info(msg);
       res.send(rsp);
     })
     .catch( e => {
@@ -61,6 +91,7 @@ app.put('/channel/:id/:state', (req, res) => {
         state: req.params.state,
         msg: e
       };
+      logger.error(e);
       res.status(400).send(rsp);
     });
 });
@@ -71,11 +102,13 @@ app.get('/channel/:id', (req, res) => {
       return zone.getState();
     })
     .then(_state => {
+      let msg = `Zone ${req.params.id} is ${_state}.`;
       let rsp = {
         id: req.params.id,
         state: _state,
-        msg: `Zone ${req.params.id} is ${_state}.`
+        msg: msg
       };
+      logger.info(msg);
       res.send(rsp);
     })
     .catch( e => {
@@ -84,6 +117,7 @@ app.get('/channel/:id', (req, res) => {
         state: req.params.state,
         msg: e
       };
+      logger.error(e);
       res.status(400).send(rsp);
     });
 });
@@ -107,5 +141,6 @@ Promise.all([
   .then(() => serve())
   .then(msg => console.log(msg))
   .catch(e => {
+    logger.error(`Error on sprinklers init. ${e}`);
     console.log(e);
   });
