@@ -14,14 +14,13 @@ var logger = new winston.Logger({
       }
     }),
     new winston.transports.File({
-      filename: 'martins-sprinklers.log',
+      filename: '/var/log/martins-sprinklers.log',
       timestamp: function () {
         return new moment().format();
       }
     })
   ]
 });
-//winston.add(winston.transports.File, { filename: 'martins-sprinklers.log' });
 
 const app = express();
 const PORT = 3217;
@@ -133,14 +132,13 @@ Promise.all([
   zc.add(z7),
   zc.add(z8)
 ])
-  .then(msg => console.log(msg))
+  .then(msg => logger.info(msg))
   .then(() => zc.setDirectionAll('out'))
-  .then(msg => console.log(msg))
+  .then(msg => logger.info(msg))
   .then(() => zc.setStateAll('off'))
-  .then(msg => console.log(msg))
+  .then(msg => logger.info(msg))
   .then(() => serve())
-  .then(msg => console.log(msg))
+  .then(msg => logger.info(msg))
   .catch(e => {
     logger.error(`Error on sprinklers init. ${e}`);
-    console.log(e);
   });

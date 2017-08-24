@@ -36,3 +36,26 @@ Returns an object like:
 }
 ```
 or a similarly-shaped error.
+
+
+## Schedule
+Using cron
+`crontab -e`
+
+```
+# Zone 1, blueberries - At 5am, errday, for 15 minutes.
+0 5 * * *    curl -X PUT localhost:3217/channel/1/on
+15 5 * * *   curl -X PUT localhost:3217/channel/1/off
+
+# Zone 2, main garden - At 5:16am, errday, for 20 minutes.
+16 5 * * *   curl -X PUT localhost:3217/channel/2/on
+36 5 * * *   curl -X PUT localhost:3217/channel/2/off
+
+# Zone 3, lawn - At 5:45am, errday, for 30 minutes.
+45 5 * * *   curl -X PUT localhost:3217/channel/3/on
+15 6 * * *   curl -X PUT localhost:3217/channel/3/off
+
+# Zone 4, herbs - At 6:16am, errday, for 10 minutes.
+16 6 * * *   curl -X PUT localhost:3217/channel/4/on
+26 6 * * *   curl -X PUT localhost:3217/channel/4/off
+```
