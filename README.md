@@ -1,8 +1,6 @@
 # Martins' Sprinklers
 Smart Sprinkler System written in Node for Raspberry Pi.
 
-**More details available at:** [https://aaronmartins.com/articles/sprinklers-node-raspberry-pi/](https://aaronmartins.com/articles/sprinklers-node-raspberry-pi/)
-
 ## Prerequisites
 * node
 * npm
@@ -12,11 +10,13 @@ Smart Sprinkler System written in Node for Raspberry Pi.
 `wget http://node-arm.herokuapp.com/node_latest_armhf.deb`
 `sudo dpkg -i node_latest_armhf.deb`
 
-## Deployment
-Edit deploy.sh, specifically the IP address of the destination. Then:
-`./deploy.sh`
+### Installing this software
+git clone https://github.com/atmartins/martins-sprinklers.git
 
 ## Use
+`npm install`
+`sudo npm start` (Pins require root access)
+
 There are a few endpoints that can be interacted with. I'm running this on my Raspberry Pi on my local network at `192.168.1.217:3217`
 
 #### HTTP Verb  - URL - Explanation
@@ -43,6 +43,10 @@ Using cron
 `crontab -e`
 
 ```
+@reboot sudo /usr/local/bin/node /home/pi/martins-sprinklers/index.js &
+```
+
+```
 # Zone 1, blueberries - At 5am, errday, for 15 minutes.
 0 5 * * *    curl -X PUT localhost:3217/channel/1/on
 15 5 * * *   curl -X PUT localhost:3217/channel/1/off
@@ -59,3 +63,14 @@ Using cron
 16 6 * * *   curl -X PUT localhost:3217/channel/4/on
 26 6 * * *   curl -X PUT localhost:3217/channel/4/off
 ```
+
+## Boot
+Restart node process after reboot:
+TODO
+
+## Development
+### Deployment
+To deploy from dev machine to the rPi, edit deploy.sh, specifically the IP address of the rPi. Then:
+`./deploy.sh`
+
+**More details available at:** [https://aaronmartins.com/articles/sprinklers-node-raspberry-pi/](https://aaronmartins.com/articles/sprinklers-node-raspberry-pi/)

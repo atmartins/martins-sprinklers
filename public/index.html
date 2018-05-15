@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Martins Sprinklers</title>
+    <script src="jquery-3.3.1.min.js"></script>
+    <style>
+        .zone {
+            width: 100px;
+            height: 100px;
+        }
+        .zone.on {
+            background: blue;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Martins' Sprinklers</h1>
+    <div class="controls"></div>
+    
+    
+    <script>
+        const controls = $('.controls');
+        const numZones = 4;
+        for (let i = 0; i < numZones; i++) {
+            const zN = i+1;
+
+            const $z = jQuery(`<div class="zone">Zone ${zN}</div>`,{})
+                .data({zN})
+                .appendTo(controls).click(function() {
+                    handleClick($(this));
+                });
+            
+            fetch(`http://192.168.1.2:3217/channel/${zN}`, {method: 'GET'})
+                .then(rsp => {
+                    try {
+                        console.log(rsp);
+                        const r = JSON.parse(rsp.body);
+                        if (r.body.state === 'on') {
+                            $z.addClass('on');
+                        }
+                    } catch (e) {
+                        console.error('Error parsing response', e);
+                    }
+                });
+        }
+
+
+        function handleClick($this) {
+            const zN = $this.data('zoneNumber');
+            console.log(zN);
+
+            if ($this.hasClass('on')) {
+                fetch(`http://192.168.1.2:3217/channel/${zN}/off`, {method: 'PUT'})
+                    .then(rsp => {
+                        console.log(rsp);
+                        $this.removeClass('on');
+                    });
+            } else {
+                fetch(`http://192.168.1.2:3217/channel/${zN}/on`, {method: 'PUT'})
+                    .then(rsp => {
+                        console.log(rsp);
+                        $this.addClass('on');
+                    });
+            }
+        }
+    </script>
+</body>
+</html>
