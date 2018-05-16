@@ -24,7 +24,7 @@ var logger = new winston.Logger({
 });
 
 const app = express();
-const PORT = 3218;
+const PORT = 3217;
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
