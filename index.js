@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const express = require('express');
 const winston = require('winston');
 const moment = require('moment');
@@ -23,7 +24,12 @@ var logger = new winston.Logger({
 });
 
 const app = express();
-const PORT = 3217;
+const PORT = 3218;
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 let zc = new ZoneController(),
   z1 = new Zone(1, 29),
@@ -39,7 +45,7 @@ let zc = new ZoneController(),
 function serve() {
   return new Promise((resolve, reject) => {
     try {
-      app.use(express.static('public'));
+      app.use('/', express.static(path.join(__dirname, 'public')))
       app.listen(PORT, () => {});
       let msg = `Martins' sprinklers app listening on ${PORT}`;
       logger.info(msg);
@@ -50,7 +56,7 @@ function serve() {
   });
 }
 
-app.put('/channel/all/:state', (req, res) => {
+app.get('/channel/all/:state', (req, res) => {
   zc.setStateAll(req.params.state)
     .then( () => {
       let msg = `Successfully set all channels to ${req.params.state}.`;
@@ -69,7 +75,7 @@ app.put('/channel/all/:state', (req, res) => {
     });
 });
 
-app.put('/channel/:id/:state', (req, res) => {
+app.get('/channel/:id/:state', (req, res) => {
   zc.get(req.params.id)
     .then(zone => {
       return zone.setState(req.params.state);
@@ -107,7 +113,7 @@ app.get('/channel/:id', (req, res) => {
         state: _state,
         msg: msg
       };
-      logger.info(msg);
+      logger.info(msg); 
       res.send(rsp);
     })
     .catch( e => {

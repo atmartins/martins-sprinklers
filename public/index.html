@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Martins Sprinklers</title>
-    <script src="jquery-3.3.1.min.js"></script>
+    <!-- <script src="jquery-3.3.1.min.js"></script> -->
+    <script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
     <style>
         .zone {
             width: 100px;
@@ -23,47 +27,65 @@
     
     
     <script>
+        const apiAddr = 'http://192.168.1.2:3217';
         const controls = $('.controls');
         const numZones = 4;
-        for (let i = 0; i < numZones; i++) {
-            const zN = i+1;
+        const idPrefix = 'zone-';
 
-            const $z = jQuery(`<div class="zone">Zone ${zN}</div>`,{})
-                .data({zN})
+        for (let i = 0; i < numZones; i++) {
+            const id = i+1;
+
+            const $z = jQuery(`<div id="${idPrefix}${id}" class="zone">Zone ${id}</div>`,{})
+                .data({id})
                 .appendTo(controls).click(function() {
                     handleClick($(this));
                 });
             
-            fetch(`http://192.168.1.2:3217/channel/${zN}`, {method: 'GET'})
+            fetch(`${apiAddr}/channel/${id}`)
                 .then(rsp => {
-                    try {
-                        console.log(rsp);
-                        const r = JSON.parse(rsp.body);
-                        if (r.body.state === 'on') {
-                            $z.addClass('on');
-                        }
-                    } catch (e) {
-                        console.error('Error parsing response', e);
-                    }
+                    return rsp.json()
+                })
+                .then(zoneInfo => {
+                    resolveZoneUi(zoneInfo);
+                })
+                .catch(e => {
+                    console.error(`Error getting initial state for ${id}`, e);
                 });
         }
 
+        function resolveZoneUi(zoneInfo) {
+            $z = $(`#${idPrefix}${zoneInfo.id}`);
+            if (zoneInfo.state === 'on') {
+                $z.addClass('on');
+            } else {
+                $z.removeClass('on');
+            }
+        }
 
         function handleClick($this) {
-            const zN = $this.data('zoneNumber');
-            console.log(zN);
+            const id = $this.data('id');
 
             if ($this.hasClass('on')) {
-                fetch(`http://192.168.1.2:3217/channel/${zN}/off`, {method: 'PUT'})
+                fetch(`${apiAddr}/channel/${id}/off`)
                     .then(rsp => {
-                        console.log(rsp);
-                        $this.removeClass('on');
+                        return rsp.json();
+                    })
+                    .then(zoneInfo => {
+                        resolveZoneUi(zoneInfo);
+                    })
+                    .catch(e => {
+                        console.error(`Error turning zone ${id} off`, e);
                     });
             } else {
-                fetch(`http://192.168.1.2:3217/channel/${zN}/on`, {method: 'PUT'})
+                fetch(`${apiAddr}/channel/${id}/on`)
                     .then(rsp => {
-                        console.log(rsp);
-                        $this.addClass('on');
+                        return rsp.json();
+                    })
+                    .then(zoneInfo => {
+                        resolveZoneUi(zoneInfo);
+                    })
+                    .catch(e => {
+                        console.error(`Error turning zone ${id} on`, e);
                     });
             }
         }
