@@ -11,7 +11,10 @@ Smart Sprinkler System written in Node for Raspberry Pi.
 `sudo dpkg -i node_latest_armhf.deb`
 
 ### Installing this software
-git clone https://github.com/atmartins/martins-sprinklers.git
+`git clone https://github.com/atmartins/martins-sprinklers.git`
+
+## Set timezone
+`sudo raspi-config`
 
 ## Use
 `npm install`
@@ -20,12 +23,12 @@ git clone https://github.com/atmartins/martins-sprinklers.git
 There are a few endpoints that can be interacted with. I'm running this on my Raspberry Pi on my local network at `192.168.1.217:3217`
 
 #### HTTP Verb  - URL - Explanation
-* `PUT` - `http://192.168.1.217:3217/channel/all/on` - Turn all channels on.
-* `PUT` - `http://192.168.1.217:3217/channel/all/off` - Turn all channels off.
+* `GET` - `http://192.168.1.217:3217/channel/all/on` - Turn all channels on.
+* `GET` - `http://192.168.1.217:3217/channel/all/off` - Turn all channels off.
 
 The following work the same for channels 1-8:
-* `PUT` - `http://192.168.1.217:3217/channel/1/on` - Turn channel 1 on.
-* `PUT` - `http://192.168.1.217:3217/channel/1/off` - Turn channel 1 off.
+* `GET` - `http://192.168.1.217:3217/channel/1/on` - Turn channel 1 on.
+* `GET` - `http://192.168.1.217:3217/channel/1/off` - Turn channel 1 off.
 * `GET` - `http://192.168.1.217:3217/channel/1` - Get channel 1's state.
 Returns an object like:
 ```
@@ -48,20 +51,20 @@ Using cron
 
 ```
 # Zone 1, blueberries - At 5am, errday, for 15 minutes.
-0 5 * * *    curl -X PUT localhost:3217/channel/1/on
-15 5 * * *   curl -X PUT localhost:3217/channel/1/off
+0 5 * * *    curl -X GET localhost:3217/channel/1/on
+15 5 * * *   curl -X GET localhost:3217/channel/1/off
 
 # Zone 2, main garden - At 5:16am, errday, for 20 minutes.
-16 5 * * *   curl -X PUT localhost:3217/channel/2/on
-36 5 * * *   curl -X PUT localhost:3217/channel/2/off
+16 5 * * *   curl -X GET localhost:3217/channel/2/on
+36 5 * * *   curl -X GET localhost:3217/channel/2/off
 
 # Zone 3, lawn - At 5:45am, errday, for 30 minutes.
-45 5 * * *   curl -X PUT localhost:3217/channel/3/on
-15 6 * * *   curl -X PUT localhost:3217/channel/3/off
+45 5 * * *   curl -X GET localhost:3217/channel/3/on
+15 6 * * *   curl -X GET localhost:3217/channel/3/off
 
 # Zone 4, herbs - At 6:16am, errday, for 10 minutes.
-16 6 * * *   curl -X PUT localhost:3217/channel/4/on
-26 6 * * *   curl -X PUT localhost:3217/channel/4/off
+16 6 * * *   curl -X GET localhost:3217/channel/4/on
+26 6 * * *   curl -X GET localhost:3217/channel/4/off
 ```
 
 ## Boot
