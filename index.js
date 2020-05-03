@@ -1,4 +1,5 @@
 'use strict';
+require('dotenv').config()
 
 const path = require('path');
 const express = require('express');
@@ -24,7 +25,7 @@ var logger = new winston.Logger({
 });
 
 const app = express();
-const PORT = 3217;
+const PORT = process.env.PORT;
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -32,14 +33,14 @@ app.use(function(req, res, next) {
 });
 
 let zc = new ZoneController(),
-  z1 = new Zone(1, 29),
-  z2 = new Zone(2, 31),
-  z3 = new Zone(3, 33),
-  z4 = new Zone(4, 35),
-  z5 = new Zone(5, 37),
-  z6 = new Zone(6, 36),
-  z7 = new Zone(7, 38),
-  z8 = new Zone(8, 40);
+  z1 = new Zone(1, process.env.PIN_CH_1),
+  z2 = new Zone(2, process.env.PIN_CH_2),
+  z3 = new Zone(3, process.env.PIN_CH_3),
+  z4 = new Zone(4, process.env.PIN_CH_4),
+  z5 = new Zone(5, process.env.PIN_CH_5),
+  z6 = new Zone(6, process.env.PIN_CH_6),
+  z7 = new Zone(7, process.env.PIN_CH_7),
+  z8 = new Zone(8, process.env.PIN_CH_8);
 
 
 function serve() {
