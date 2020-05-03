@@ -53,8 +53,12 @@
     <h1 class="title">Martins' Sprinklers</h1>
 
     <div class="controls"></div>
+
+    <div id="messageFromServer"></div>
+
     <script>
         const API_LOCATION = `http://${window.location.hostname}:${window.location.port}`;
+        const WS_LOCATION = `ws://${window.location.hostname}:1337`;
         const $CONTROLS = $('.controls');
         const NUM_ZONES = 4;
         const ID_PREFIX = 'zone-';
@@ -101,6 +105,17 @@
                         console.error(`Error turning zone ${id} ${operation}`, e);
                     });
         }
+
+        var ws = new WebSocket(WS_LOCATION);
+        ws.onopen = function () {
+            ws.send(JSON.stringify({
+                test: 'baz',
+            }));
+        };
+        ws.onmessage = function (message) {
+            console.log("message received: " + message.data);
+            document.getElementById('messageFromServer').innerHTML = message.data;
+        };
     </script>
 </body>
 

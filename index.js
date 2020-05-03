@@ -7,6 +7,17 @@ const moment = require('moment');
 const Zone = require('./lib/Zone');
 const ZoneController = require('./lib/ZoneController');
 
+
+// ws
+const WebSocketServer = require('websocket').server;
+const http = require('http');
+
+const server = http.createServer();
+server.listen(1337, function() { });
+const wsServer = new WebSocketServer({ httpServer: server });
+// end ws
+
+
 var logger = new winston.Logger({
   transports: [
     new winston.transports.Console({
@@ -126,6 +137,43 @@ app.get('/channel/:id', (req, res) => {
       res.status(400).send(rsp);
     });
 });
+
+
+// WebSocket server
+wsServer.on('request', function(request) {
+  var connection = request.accept(null, request.origin);
+
+  // This is the most important callback for us, we'll handle
+  // all messages from users here.
+  connection.on('message', function(message) {
+    if (message.type === 'utf8') {
+      console.log('string msg: ', message.utf8Data);
+      let object;
+      try {
+        object = JSON.parse(message.utf8Data);
+      } catch (e) {
+        logger.error(e);
+      }
+      console.log('json msg: ', object);
+    }
+  });
+
+  connection.on('close', function(connection) {
+    // close user connection
+  });
+});
+
+setInterval(function() {
+  const message = {
+    type: 'CHANNEL_STATE',
+    payload: {
+
+    },
+  };
+  wsServer.broadcast(message);
+  console.log('sending', message);
+}, 1000);
+// End websocker server
 
 
 Promise.all([
