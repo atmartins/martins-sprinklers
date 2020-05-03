@@ -6,23 +6,23 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Martins Sprinklers</title>
     <link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet">
-    <script
-        src="https://code.jquery.com/jquery-3.3.1.min.js"
-        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <style>
         body {
             font-family: 'Noto Sans', sans-serif;
             font-size: 16px;
         }
+
         .title {
             text-align: center;
         }
+
         .controls {
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
         }
+
         .zone {
             background: rgb(85, 85, 85);
             border-radius: .5rem;
@@ -42,32 +42,33 @@
             -ms-user-select: none;
             user-select: none;
         }
+
         .zone.on {
             background: rgb(0, 186, 219);
         }
     </style>
 </head>
+
 <body>
     <h1 class="title">Martins' Sprinklers</h1>
 
     <div class="controls"></div>
-    
     <script>
-        const apiAddr = 'http://192.168.1.2:3217';
-        const controls = $('.controls');
-        const numZones = 4;
-        const idPrefix = 'zone-';
+        const API_LOCATION = `http://${window.location.hostname}:${window.location.port}`;
+        const $CONTROLS = $('.controls');
+        const NUM_ZONES = 4;
+        const ID_PREFIX = 'zone-';
 
-        for (let i = 0; i < numZones; i++) {
-            const id = i+1;
+        for (let i = 0; i < NUM_ZONES; i++) {
+            const id = i + 1;
 
-            const $z = jQuery(`<div id="${idPrefix}${id}" class="zone">Zone ${id}</div>`,{})
-                .data({id})
-                .appendTo(controls).click(function() {
+            const $z = jQuery(`<div id="${ID_PREFIX}${id}" class="zone">Zone ${id}</div>`, {})
+                .data({ id })
+                .appendTo($CONTROLS).click(function () {
                     handleClick($(this));
                 });
-            
-            fetch(`${apiAddr}/channel/${id}`)
+
+            fetch(`${API_LOCATION}/channel/${id}`)
                 .then(rsp => {
                     return rsp.json()
                 })
@@ -80,7 +81,7 @@
         }
 
         function resolveZoneUi(zoneInfo) {
-            $z = $(`#${idPrefix}${zoneInfo.id}`);
+            $z = $(`#${ID_PREFIX}${zoneInfo.id}`);
             if (zoneInfo.state === 'on') {
                 $z.addClass('on');
             } else {
@@ -90,31 +91,17 @@
 
         function handleClick($this) {
             const id = $this.data('id');
-
-            if ($this.hasClass('on')) {
-                fetch(`${apiAddr}/channel/${id}/off`)
-                    .then(rsp => {
-                        return rsp.json();
-                    })
+            const operation = $this.hasClass('on') ? 'off' : 'on';
+            fetch(`${API_LOCATION}/channel/${id}/${operation}`)
+                    .then(rsp => rsp.json())
                     .then(zoneInfo => {
                         resolveZoneUi(zoneInfo);
                     })
                     .catch(e => {
-                        console.error(`Error turning zone ${id} off`, e);
+                        console.error(`Error turning zone ${id} ${operation}`, e);
                     });
-            } else {
-                fetch(`${apiAddr}/channel/${id}/on`)
-                    .then(rsp => {
-                        return rsp.json();
-                    })
-                    .then(zoneInfo => {
-                        resolveZoneUi(zoneInfo);
-                    })
-                    .catch(e => {
-                        console.error(`Error turning zone ${id} on`, e);
-                    });
-            }
         }
     </script>
 </body>
+
 </html>

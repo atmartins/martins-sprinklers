@@ -15,7 +15,7 @@ var logger = new winston.Logger({
       }
     }),
     new winston.transports.File({
-      filename: '/var/log/martins-sprinklers.log',
+      filename: process.env.LOG_FILE_PATH,
       timestamp: function () {
         return new moment().format();
       }
