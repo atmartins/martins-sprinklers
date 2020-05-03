@@ -2,8 +2,8 @@
 
 # Run as sudo on pi
 
-cp install/cron/martins-sprinklers.sh /etc/cron.d/
+sudo cp install/cron/martins-sprinklers /etc/cron.d/
 
-touch /var/log/martins-sprinklers.log
+sudo touch /var/log/martins-sprinklers.log
 
-npm install
+npm install --production

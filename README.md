@@ -54,6 +54,11 @@ Adjust values in `.env` and `./install/cron/martins-sprinklers` if desired, then
     sudo raspi-config
 
 
+## Connecting Pins
+Here are the default pins referenced by `.env`:
+![rpi pinout](./rpi-pinout.png "rpi-pinout.png")
+
+
 ## Use
 ### Start
 *Note: Pin control requires root access*
