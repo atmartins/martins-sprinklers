@@ -1,6 +1,5 @@
 'use strict';
-require('dotenv').config()
-
+require('dotenv').config({ path: __dirname + '/.env' }); // explicit path for cron
 const path = require('path');
 const express = require('express');
 const winston = require('winston');
