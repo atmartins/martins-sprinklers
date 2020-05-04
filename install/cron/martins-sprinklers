@@ -1,7 +1,8 @@
+
+# ===== Martins Sprinklers =====
 @reboot sudo /usr/local/bin/node /home/pi/martins-sprinklers/index.js &
 
 # Examples, un-comment and adjust
-
 # Zone 1, blueberries - At 5am, errday, for 15 minutes.
 # 0 5 * * *    curl -X GET localhost:3217/channel/1/on
 # 15 5 * * *   curl -X GET localhost:3217/channel/1/off
@@ -17,3 +18,4 @@
 # Zone 4, herbs - At 6:16am, errday, for 10 minutes.
 # 16 6 * * *   curl -X GET localhost:3217/channel/4/on
 # 26 6 * * *   curl -X GET localhost:3217/channel/4/off
+# ===== End Martins Sprinklers =====
