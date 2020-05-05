@@ -118,7 +118,7 @@ Edit `./install/cron/martins-sprinklers` before install, or `/etc/cron.d/martins
 ## Development
 If developing with OSX, start the server with:
 
-  PHYSICAL_ENV=osx LOG_FILE_PATH=./ignored/log.json node index.js
+    PHYSICAL_ENV=osx LOG_FILE_PATH=./ignored/log.json node index.js
 
 Then visit localhost:3217 in your browser. A mock class is provided for gpio pins, to simulate them turning on and off. View the server log to confirm their state.
 

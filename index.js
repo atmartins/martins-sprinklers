@@ -6,19 +6,9 @@ const winston = require('winston');
 const moment = require('moment');
 const Zone = require('./lib/Zone');
 const ZoneController = require('./lib/ZoneController');
+const ws = require('./lib/Ws');
 
-
-// ws
-const WebSocketServer = require('websocket').server;
-const http = require('http');
-
-const server = http.createServer();
-server.listen(1337, function() { });
-const wsServer = new WebSocketServer({ httpServer: server });
-// end ws
-
-
-var logger = new winston.Logger({
+const logger = new winston.Logger({
   transports: [
     new winston.transports.Console({
       timestamp: function () {
@@ -36,6 +26,8 @@ var logger = new winston.Logger({
 
 const app = express();
 const PORT = process.env.PORT;
+
+// TODO move into serveStatic()
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -53,7 +45,7 @@ let zc = new ZoneController(),
   z8 = new Zone(8, process.env.PIN_CH_8);
 
 
-function serve() {
+function serveStatic() {
   return new Promise((resolve, reject) => {
     try {
       app.use('/', express.static(path.join(__dirname, 'public')))
@@ -69,20 +61,27 @@ function serve() {
 
 app.get('/channel/all/:state', (req, res) => {
   zc.setStateAll(req.params.state)
-    .then( () => {
-      let msg = `Successfully set all channels to ${req.params.state}.`;
-      let rsp = {
+    .then(() => {
+      const msg = `Successfully set all channels to ${req.params.state}.`;
+      logger.info(msg);
+
+      const rsp = {
         id: 'all',
         state: req.params.state,
         msg: msg
       };
-      logger.info(msg);
       res.send(rsp);
     })
-    .catch( e => {
-      let msg = `Error setting all channels to ${req.params.state}. ${e}`;
+    .catch(e => {
+      const msg = `Error setting all channels to ${req.params.state}. ${e}`;
       logger.error(msg);
-      res.send(msg);
+
+      const rsp = {
+        id: 'all',
+        state: null,
+        msg: msg
+      };
+      res.send(rsp);
     });
 });
 
@@ -91,23 +90,25 @@ app.get('/channel/:id/:state', (req, res) => {
     .then(zone => {
       return zone.setState(req.params.state);
     })
-    .then( () => {
-      let msg = `Set zone ${req.params.id} to ${req.params.state}.`;
-      let rsp = {
+    .then(() => {
+      const msg = `Set zone ${req.params.id} to ${req.params.state}.`;
+      logger.info(msg);
+
+      const rsp = {
         id: req.params.id,
         state: req.params.state,
         msg: msg
       };
-      logger.info(msg);
       res.send(rsp);
+      ws.broadcastObj(rsp);
     })
-    .catch( e => {
-      let rsp = {
+    .catch(e => {
+      logger.error(e);
+      const rsp = {
         id: req.params.id,
         state: req.params.state,
         msg: e
       };
-      logger.error(e);
       res.status(400).send(rsp);
     });
 });
@@ -118,8 +119,8 @@ app.get('/channel/:id', (req, res) => {
       return zone.getState();
     })
     .then(_state => {
-      let msg = `Zone ${req.params.id} is ${_state}.`;
-      let rsp = {
+      const msg = `Zone ${req.params.id} is ${_state}.`;
+      const rsp = {
         id: req.params.id,
         state: _state,
         msg: msg
@@ -128,7 +129,7 @@ app.get('/channel/:id', (req, res) => {
       res.send(rsp);
     })
     .catch( e => {
-      let rsp = {
+      const rsp = {
         id: req.params.id,
         state: req.params.state,
         msg: e
@@ -137,44 +138,6 @@ app.get('/channel/:id', (req, res) => {
       res.status(400).send(rsp);
     });
 });
-
-
-// WebSocket server
-wsServer.on('request', function(request) {
-  var connection = request.accept(null, request.origin);
-
-  // This is the most important callback for us, we'll handle
-  // all messages from users here.
-  connection.on('message', function(message) {
-    if (message.type === 'utf8') {
-      console.log('string msg: ', message.utf8Data);
-      let object;
-      try {
-        object = JSON.parse(message.utf8Data);
-      } catch (e) {
-        logger.error(e);
-      }
-      console.log('json msg: ', object);
-    }
-  });
-
-  connection.on('close', function(connection) {
-    // close user connection
-  });
-});
-
-setInterval(function() {
-  const message = {
-    type: 'CHANNEL_STATE',
-    payload: {
-
-    },
-  };
-  wsServer.broadcast(message);
-  console.log('sending', message);
-}, 1000);
-// End websocker server
-
 
 Promise.all([
   zc.add(z1),
@@ -191,8 +154,9 @@ Promise.all([
   .then(msg => logger.info(msg))
   .then(() => zc.setStateAll('off'))
   .then(msg => logger.info(msg))
-  .then(() => serve())
+  .then(() => serveStatic())
   .then(msg => logger.info(msg))
+  .then(() => ws.setupWsServer())
   .catch(e => {
     logger.error(`Error on sprinklers init. ${e}`);
   });
