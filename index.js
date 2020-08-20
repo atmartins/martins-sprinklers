@@ -7,6 +7,7 @@ const moment = require('moment');
 const Zone = require('./lib/Zone');
 const ZoneController = require('./lib/ZoneController');
 const ws = require('./lib/Ws');
+const db = require('./lib/Db');
 
 const logger = new winston.Logger({
   transports: [
@@ -23,6 +24,12 @@ const logger = new winston.Logger({
     })
   ]
 });
+
+try {
+  db.connect();
+} catch (e) {
+  logger.error('Error connecting to db', e);
+}
 
 const app = express();
 const PORT = process.env.PORT;

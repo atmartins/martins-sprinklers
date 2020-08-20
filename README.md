@@ -123,3 +123,16 @@ If developing with OSX, start the server with:
 Then visit localhost:3217 in your browser. A mock class is provided for gpio pins, to simulate them turning on and off. View the server log to confirm their state.
 
 **More** [https://aaronmartins.com/articles/sprinklers-node-raspberry-pi/](https://aaronmartins.com/articles/sprinklers-node-raspberry-pi/)
+
+
+## InfluxDB
+Run it with Docker, and set up the database:
+
+    docker run -p 8086:8086 -v $PWD:/var/lib/influxdb influxdb
+    curl -G http://localhost:8086/query --data-urlencode "q=CREATE DATABASE martinssprinklers"
+
+## Grafana
+
+    docker run -d -p 3000:3000 --name grafana grafana/grafana:6.5.0
+
+Default login is `admin` `admin`
