@@ -8,6 +8,7 @@ chai.use(chaiAsPromised);
 chai.should(); //use "should" style of chai
 
 mock('rpi-gpio', './mocks/rpi-gpio');
+mock('../lib/Ws', './mocks/Ws.js');
 
 // The module to test:
 const Zone = require('../lib/Zone');
@@ -16,6 +17,7 @@ const Zone = require('../lib/Zone');
 describe('Zone class', () => {
   let Z1 = new Zone(1, 33);
   let Z2 = new Zone(2, 34);
+  let Z3 = new Zone(3, 35);
 
   describe('state', () => {
     it('should set on', () => {
@@ -62,6 +64,20 @@ describe('Zone class', () => {
     });
     it('should get pin', () => {
       return Z2.getPin().should.eventually.equal(34);
+    });
+  });
+
+  describe('auto-off', () => {
+    it('should set on with auto-off in X ms', () => {
+      const DURATION = 1000;
+      Z3.setState('on', DURATION);
+      Z3.runForMs.should.be.equal(DURATION);
+      Z3.state.should.be.equal('on');
+      Z3.timeoutFn.should.not.be.undefined;
+      Z3.timeoutId.should.not.be.undefined;
+      Z3.timeoutFn();
+      Z3.state.should.be.equal('off');
+      Z3.timeoutFn.should.not.be.undefined;
     });
   });
 });

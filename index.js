@@ -55,11 +55,9 @@ let zc = new ZoneController(),
 function serveStatic() {
   return new Promise((resolve, reject) => {
     try {
-      app.use('/', express.static(path.join(__dirname, 'public')))
+      app.use('/', express.static(path.join(__dirname, 'public')));
       app.listen(PORT, () => {});
-      let msg = `Martins' sprinklers app listening on ${PORT}`;
-      logger.info(msg);
-      resolve(msg);
+      resolve(`Martins' sprinklers app listening on ${PORT}`);
     } catch(e) {
       reject(e);
     }
@@ -71,24 +69,12 @@ app.get('/channel/all/:state', (req, res) => {
     .then(() => {
       const msg = `Successfully set all channels to ${req.params.state}.`;
       logger.info(msg);
-
-      const rsp = {
-        id: 'all',
-        state: req.params.state,
-        msg: msg
-      };
-      res.send(rsp);
+      res.send({ id: 'all', state: req.params.state, msg: msg });
     })
     .catch(e => {
       const msg = `Error setting all channels to ${req.params.state}. ${e}`;
       logger.error(msg);
-
-      const rsp = {
-        id: 'all',
-        state: null,
-        msg: msg
-      };
-      res.send(rsp);
+      res.send({ id: 'all', state: null, msg: msg });
     });
 });
 
@@ -100,23 +86,13 @@ app.get('/channel/:id/:state', (req, res) => {
     .then(() => {
       const msg = `Set zone ${req.params.id} to ${req.params.state}.`;
       logger.info(msg);
-
-      const rsp = {
-        id: req.params.id,
-        state: req.params.state,
-        msg: msg
-      };
+      const rsp = { id: req.params.id, state: req.params.state, msg: msg };
       res.send(rsp);
       ws.broadcastObj(rsp);
     })
     .catch(e => {
       logger.error(e);
-      const rsp = {
-        id: req.params.id,
-        state: req.params.state,
-        msg: e
-      };
-      res.status(400).send(rsp);
+      res.status(400).send({ id: req.params.id, state: req.params.state, msg: e });
     });
 });
 
@@ -127,22 +103,12 @@ app.get('/channel/:id', (req, res) => {
     })
     .then(_state => {
       const msg = `Zone ${req.params.id} is ${_state}.`;
-      const rsp = {
-        id: req.params.id,
-        state: _state,
-        msg: msg
-      };
       logger.info(msg); 
-      res.send(rsp);
+      res.send({ id: req.params.id, state: _state, msg: msg });
     })
     .catch( e => {
-      const rsp = {
-        id: req.params.id,
-        state: req.params.state,
-        msg: e
-      };
       logger.error(e);
-      res.status(400).send(rsp);
+      res.status(400).send({ id: req.params.id, state: req.params.state, msg: e });
     });
 });
 

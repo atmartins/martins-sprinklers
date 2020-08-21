@@ -34,7 +34,7 @@ describe('ZoneController class', () => {
     let zc = new ZoneController();
     zc.add(new Zone(1, 29));
     it('should get by (int) id.', () => {
-      zc.get(1).then(zone => {console.log(zone)})
+      // zc.get(1).then(zone => {console.log(zone)})
       return zc.get(1).should.eventually.be.an.instanceof(Zone);
     });
     it('should get by (string) id.', () => {
