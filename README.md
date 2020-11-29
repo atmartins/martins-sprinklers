@@ -26,7 +26,7 @@ Look for armv6 (vs 7, etc). For arm v6 (Raspberry Pi Zero + maybe others), downl
 
 Enter the package directory and test:
 
-    cd node-v6.11.1-linux-armv6l/
+    cd node-v8.9.0-linux-armv6l/
     ./bin/node -v
 
 If you see a node version, it works with your architecture! Now, it's safe to copy to a spot in your path:
@@ -61,9 +61,9 @@ Here are the default pins referenced by `.env`:
 
 ## Use
 ### Start
-*Note: Pin control requires root access*
 
-    sudo npm start
+#### >>>> Note: The app is started after reboot! See ./install/cron/martins-sprinklers <<<< 
+*Pin control requires root access* `sudo npm start`
 
 
 ### Turn channel(s) on or off
@@ -125,11 +125,16 @@ Then visit localhost:3217 in your browser. A mock class is provided for gpio pin
 **More** [https://aaronmartins.com/articles/sprinklers-node-raspberry-pi/](https://aaronmartins.com/articles/sprinklers-node-raspberry-pi/)
 
 
+# Install docker (pug1)
+
+    sudo snap install docker
+
 ## InfluxDB
 Run it with Docker, and set up the database:
 
     docker run -p 8086:8086 -v $PWD:/var/lib/influxdb influxdb
     curl -G http://localhost:8086/query --data-urlencode "q=CREATE DATABASE martinssprinklers"
+    curl -POST http://localhost:8086/query --data-urlencode "q=CREATE DATABASE martinssprinklers"
 
 ## Grafana
 
