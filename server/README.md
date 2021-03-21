@@ -130,14 +130,11 @@ Then visit localhost:3217 in your browser. A mock class is provided for gpio pin
     sudo snap install docker
 
 ## InfluxDB
-Run it with Docker, and set up the database:
+Set up the database:
 
-    docker run -p 8086:8086 -v $PWD:/var/lib/influxdb influxdb
-    curl -G http://localhost:8086/query --data-urlencode "q=CREATE DATABASE martinssprinklers"
     curl -POST http://localhost:8086/query --data-urlencode "q=CREATE DATABASE martinssprinklers"
 
 ## Grafana
-
-    docker run -d -p 3000:3000 --name grafana grafana/grafana:6.5.0
+Runs on port 3000
 
 Default login is `admin` `admin`

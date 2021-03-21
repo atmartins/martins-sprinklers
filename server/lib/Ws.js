@@ -10,7 +10,7 @@ function setupWsServer() {
         throw new Error('Already constructed wsServer');
     }
     const server = http.createServer();
-    server.listen(1337, function() { });
+    server.listen(process.env.PORT_WS, function() { });
     wsServer = new WebSocketServer({ httpServer: server });
 
     // WebSocket server
