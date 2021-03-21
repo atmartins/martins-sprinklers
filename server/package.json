@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "dev": "rm .env && cp .env-example-dev .env && node index.js",
     "test": "./node_modules/mocha/bin/mocha test/*"
   },
   "author": "Aaron Martins",
