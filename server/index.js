@@ -25,12 +25,6 @@ const logger = new winston.Logger({
   ]
 });
 
-try {
-  db.connect();
-} catch (e) {
-  logger.error('Error connecting to db', e);
-}
-
 const app = express();
 const PORT = process.env.PORT;
 
