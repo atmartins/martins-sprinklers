@@ -8,4 +8,4 @@ export const WS_LOCATION = `ws://${SERVER_ADDRESS}:${WS_PORT}`;
 export const NUM_ZONES = 8;
 
 const ONE_SEC_IN_MS = 1000;
-export const DOOR_MOVE_DURATION_MS = 30 * ONE_SEC_IN_MS;
+export const DOOR_MOVE_DURATION_MS = 20 * ONE_SEC_IN_MS;

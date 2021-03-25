@@ -30,11 +30,11 @@ export const CoopDoor = ({name, zoneInfos}: {name: string, zoneInfos: [ZoneInfo,
 
     return <div className="coop-door">
         <div className="coop-door_open btn" onClick={() => { setOc('opening'); run(openZoneInfo); }}>
-            {remaining && oc === 'opening' ? <Countdown initial={DOOR_MOVE_DURATION_MS} remaining={remaining} dir="up">Open</Countdown> : 'Open'}
+            {remaining && oc === 'opening' ? <Countdown initial={DOOR_MOVE_DURATION_MS} remaining={remaining} dir="up"><div>Open {openZoneInfo.id}</div></Countdown> : `Open ${openZoneInfo.id}`}
         </div>
         {name} {remaining ? `${remaining/1000}s`: null}
         <div className="coop-door_close btn" onClick={() => { setOc('closing'); run(closeZoneInfo); }}>
-            {remaining && oc === 'closing' ? <Countdown initial={DOOR_MOVE_DURATION_MS} remaining={remaining}>Close</Countdown> : 'Close'}
+            {remaining && oc === 'closing' ? <Countdown initial={DOOR_MOVE_DURATION_MS} remaining={remaining}><div>Close {closeZoneInfo.id}</div></Countdown> : `Close ${closeZoneInfo.id}`}
         </div>
     </div>
 }

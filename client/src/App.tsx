@@ -9,7 +9,8 @@ import { initialZoneInfo, ZoneInfo } from './zoneInfo';
 let initialInfos: ZoneInfo[] = [];
 
 for (let i = 1; i <= NUM_ZONES; i++) {
-    initialInfos.push(produce(initialZoneInfo, draft => { draft.id = i }));
+    const init = produce(initialZoneInfo, draft => { draft.id = i })
+    initialInfos.push(init);
 }
 
 enum WsStatus {
@@ -24,6 +25,16 @@ let ws: WebSocket;
 function App() {
     const [zoneInfos, setZoneInfos] = React.useState<ZoneInfo[]>(initialInfos);
     const [wsStatus, setWsStatus] = React.useState<WsStatus>(WsStatus.CONNECTING);
+
+    const getZone = (id: ZoneInfo['id']): ZoneInfo | undefined => {
+        let foundZone: ZoneInfo | undefined;
+        zoneInfos.forEach((z) => {
+            if (z.id === id) {
+                foundZone = z;
+            }
+        });
+        return foundZone;
+    }
 
     React.useEffect(() => {
         if (wsStatus === WsStatus.ERROR || ws) return;
@@ -41,11 +52,12 @@ function App() {
             let zoneInfo: ZoneInfo;
             try {
                 zoneInfo = JSON.parse(message.data);
+                zoneInfo.id = parseInt(zoneInfo.id as unknown as string, 10);
             } catch (e) {
                 console.log('Error parsing message.data from websockets');
                 throw new Error(e);
             }
-
+            console.log('message from server', zoneInfo)
             const updatedZoneInfos = produce(zoneInfos, draft => { draft[zoneInfo.id - 1] = zoneInfo });
             setZoneInfos(updatedZoneInfos);
         };
@@ -56,23 +68,29 @@ function App() {
         }
     }, [wsStatus, zoneInfos])
 
+    const z5 = getZone(5);
+    const z6 = getZone(6);
+    const z7 = getZone(7);
+    const z8 = getZone(8);
+
     return (
         <div className="App">
             <header className="App-header">
                 <h1 className="title">Martins' Sprinklers</h1>
+                <div className="ws-status">connection: {wsStatus}</div>
             </header>
             
             <div className="controls">
-                <CoopDoor name="Chickens" zoneInfos={[zoneInfos[6], zoneInfos[5] ]} />
-                <CoopDoor name="Ducks" zoneInfos={[zoneInfos[7], zoneInfos[8]]} />
+                { z5 && z6 ? <CoopDoor name="Chickens" zoneInfos={[ z6, z5 ]} /> : null }
+                { z7 && z8 ? <CoopDoor name="Ducks" zoneInfos={[ z7, z8 ]} /> : null }
                 {
                     zoneInfos
-                        .filter((z: ZoneInfo) => z.id <= 4) // zones 5-8 are for coop doors
+                        .filter((z: ZoneInfo) => z.id <= 8) // zones 5-8 are for coop doors
                         .map((z: ZoneInfo) => <Zone key={z.id} zoneInfo={z} />)
                 }
             </div>
             
-            <div className="ws-status">ws: {wsStatus}</div>
+            
         </div>
     );
 }

@@ -24,6 +24,7 @@ export const off = (zoneInfo: ZoneInfo): ZoneInfo => {
 export interface ZoneInfo {
     id: number,
     state: ZoneState,
+    // msg: string, // TODO
 }
 
 export const initialZoneInfo: ZoneInfo = {
