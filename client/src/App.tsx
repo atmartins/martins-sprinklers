@@ -1,7 +1,7 @@
 import produce from 'immer';
 import React from 'react';
 import './App.css';
-import { NUM_ZONES, WS_LOCATION } from './constants';
+import { NUM_ZONES, WS_PORT } from './constants';
 import { CoopDoor } from './CoopDoor';
 import { Zone } from './Zone';
 import { initialZoneInfo, ZoneInfo } from './zoneInfo';
@@ -9,7 +9,7 @@ import { initialZoneInfo, ZoneInfo } from './zoneInfo';
 let initialInfos: ZoneInfo[] = [];
 
 for (let i = 1; i <= NUM_ZONES; i++) {
-    const init = produce(initialZoneInfo, draft => { draft.id = i })
+    const init = produce(initialZoneInfo, (draft: ZoneInfo)=> { draft.id = i })
     initialInfos.push(init);
 }
 
@@ -28,7 +28,7 @@ function App() {
 
     const getZone = (id: ZoneInfo['id']): ZoneInfo | undefined => {
         let foundZone: ZoneInfo | undefined;
-        zoneInfos.forEach((z) => {
+        zoneInfos.forEach((z: ZoneInfo) => {
             if (z.id === id) {
                 foundZone = z;
             }
@@ -39,7 +39,7 @@ function App() {
     React.useEffect(() => {
         if (wsStatus === WsStatus.ERROR || ws) return;
 
-        ws = new WebSocket(WS_LOCATION);
+        ws = new WebSocket(`ws://${location.hostname}:${WS_PORT}`);
         ws.onopen = () => {
             ws.send(JSON.stringify({ id: undefined, msg: 'Client connected!' }));
             setWsStatus(WsStatus.OPEN);
@@ -53,9 +53,9 @@ function App() {
             try {
                 zoneInfo = JSON.parse(message.data);
                 zoneInfo.id = parseInt(zoneInfo.id as unknown as string, 10);
-            } catch (e) {
+            } catch (err) {
                 console.log('Error parsing message.data from websockets');
-                throw new Error(e);
+                throw err;
             }
             console.log('message from server', zoneInfo)
             const updatedZoneInfos = produce(zoneInfos, draft => { draft[zoneInfo.id - 1] = zoneInfo });
