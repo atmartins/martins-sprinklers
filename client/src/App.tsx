@@ -39,7 +39,7 @@ function App() {
     React.useEffect(() => {
         if (wsStatus === WsStatus.ERROR || ws) return;
 
-        ws = new WebSocket(`ws://${location.hostname}:${WS_PORT}`);
+        ws = new WebSocket(`ws://${window.location.hostname}:${WS_PORT}`);
         ws.onopen = () => {
             ws.send(JSON.stringify({ id: undefined, msg: 'Client connected!' }));
             setWsStatus(WsStatus.OPEN);
